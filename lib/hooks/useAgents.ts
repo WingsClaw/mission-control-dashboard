@@ -51,18 +51,20 @@ export function useAgents() {
       tasksCompleted: 0,
       uptime: 0,
     };
-    setAgents([...agents, newAgent]);
+    setAgents((currentAgents) => [...currentAgents, newAgent]);
     return newAgent;
   };
 
   const updateAgent = (id: string, updates: Partial<Agent>) => {
-    setAgents(agents.map(agent =>
-      agent.id === id ? { ...agent, ...updates, lastActive: new Date().toISOString() } : agent
-    ));
+    setAgents((currentAgents) =>
+      currentAgents.map((agent) =>
+        agent.id === id ? { ...agent, ...updates, lastActive: new Date().toISOString() } : agent,
+      ),
+    );
   };
 
   const deleteAgent = (id: string) => {
-    setAgents(agents.filter(agent => agent.id !== id));
+    setAgents((currentAgents) => currentAgents.filter((agent) => agent.id !== id));
   };
 
   const updateAgentStatus = (id: string, status: Agent['status']) => {

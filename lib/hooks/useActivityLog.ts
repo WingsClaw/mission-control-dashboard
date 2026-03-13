@@ -6,7 +6,7 @@ const INITIAL_ACTIVITIES: Activity[] = [];
 export function useActivityLog() {
   const [activities, setActivities] = useLocalStorage<Activity[]>('mission-activities', INITIAL_ACTIVITIES);
 
-  const addActivity = (type: Activity['type'], message: string, metadata?: Record<string, any>) => {
+  const addActivity = (type: Activity['type'], message: string, metadata?: Record<string, unknown>) => {
     const newActivity: Activity = {
       id: `activity-${Date.now()}`,
       type,
@@ -14,7 +14,7 @@ export function useActivityLog() {
       timestamp: new Date().toISOString(),
       metadata,
     };
-    setActivities([newActivity, ...activities].slice(0, 100)); // Keep last 100 activities
+    setActivities((currentActivities) => [newActivity, ...currentActivities].slice(0, 100));
   };
 
   const clearActivities = () => {

@@ -70,28 +70,57 @@ export function useTasks() {
       updatedAt: new Date().toISOString(),
       progress: 0,
     };
-    setTasks([...tasks, newTask]);
+    setTasks((currentTasks) => [...currentTasks, newTask]);
     return newTask;
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, ...updates, updatedAt: new Date().toISOString() } : task
-    ));
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === id ? { ...task, ...updates, updatedAt: new Date().toISOString() } : task,
+      ),
+    );
   };
 
   const deleteTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== id));
+    setTasks((currentTasks) => currentTasks.filter((task) => task.id !== id));
   };
 
   const updateTaskStatus = (id: string, status: Task['status']) => {
-    const progress = status === 'completed' ? 100 : status === 'pending' ? 0 : tasks.find(t => t.id === id)?.progress || 0;
-    updateTask(id, { status, progress });
+    setTasks((currentTasks) =>
+      currentTasks.map((task) => {
+        if (task.id !== id) {
+          return task;
+        }
+
+        const progress =
+          status === 'completed' ? 100 : status === 'pending' ? 0 : task.progress;
+
+        return {
+          ...task,
+          status,
+          progress,
+          updatedAt: new Date().toISOString(),
+        };
+      }),
+    );
   };
 
   const updateTaskProgress = (id: string, progress: number) => {
     const status = progress === 100 ? 'completed' : progress > 0 ? 'in_progress' : 'pending';
-    updateTask(id, { progress: Math.min(100, Math.max(0, progress)), status });
+
+    setTasks((currentTasks) =>
+      currentTasks.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              progress: Math.min(100, Math.max(0, progress)),
+              status,
+              updatedAt: new Date().toISOString(),
+            }
+          : task,
+      ),
+    );
   };
 
   const assignTask = (taskId: string, agentId: string | null) => {

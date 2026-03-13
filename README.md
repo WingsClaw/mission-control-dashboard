@@ -1,6 +1,6 @@
-# Mission Control Dashboard 🚀
+# Mission Control Dashboard
 
-A real-time dashboard for monitoring and managing AI automation agents, tasks, and projects. Built with Next.js 14, TypeScript, and TailwindCSS.
+A mission-control UI for a real local OpenClaw workspace. Built with Next.js 14, TypeScript, and TailwindCSS.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-14-black)
@@ -9,11 +9,12 @@ A real-time dashboard for monitoring and managing AI automation agents, tasks, a
 
 ## ✨ Features
 
-- **Agent Management**: Add, edit, delete, and monitor automation agents
-- **Task Tracking**: Create tasks, assign to agents, track progress, and manage priorities
-- **Real-time Metrics**: Dashboard with live statistics on agents, tasks, and system performance
-- **Activity Log**: Track all system events and changes in a timeline view
-- **Local Storage Persistence**: All data persists in browser localStorage - no database needed
+- **Live OpenClaw Integration**: Reads the real OpenClaw home, workspace docs, command log, scheduler, and session indexes on the server
+- **Writable Mission Board**: Tasks are stored in the OpenClaw workspace `kanban.json` file instead of browser localStorage
+- **Activity Timeline**: The activity screen is sourced from the real `commands.log`
+- **Projects Surface**: Group live tasks into real workstreams and track progress by project
+- **Calendar And Heartbeat**: Inspect `cron/jobs.json` and `HEARTBEAT.md` from the workspace
+- **Docs, Memory, Team, And Office Views**: Search workspace markdown, inspect memory notes, view team topology, and visualize agent focus
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
 - **Modern UI**: Clean, professional interface built with TailwindCSS
 
@@ -23,7 +24,8 @@ A real-time dashboard for monitoring and managing AI automation agents, tasks, a
 - **Language**: TypeScript 5.4
 - **Styling**: TailwindCSS 3.4
 - **Icons**: Lucide React
-- **State Management**: React Hooks + localStorage
+- **Runtime Data Layer**: Server components + server-only OpenClaw filesystem reader
+- **Task Mutations**: Next.js route handlers over the OpenClaw board file
 - **Runtime**: Node.js 22+
 
 ## 📦 Installation
@@ -46,84 +48,113 @@ npm run dev
 4. **Open in browser**:
 Navigate to [http://localhost:3000](http://localhost:3000)
 
+5. **Point the app at OpenClaw**:
+The dashboard auto-detects the default local OpenClaw installation. If your OpenClaw home lives elsewhere, set `OPENCLAW_HOME` before starting the app.
+
 ## 🚀 Usage
 
 ### Dashboard Overview
-- View all system metrics at a glance
-- Monitor active agents and their status
-- Check recent tasks and their progress
-- Track system uptime and performance
+- View the real OpenClaw runtime at a glance
+- Monitor active agents discovered from session indexes
+- Check recent work from the shared mission board
+- Scan the recent command timeline and workspace warnings
 
 ### Managing Agents
 1. Go to the **Agents** page
-2. Click **Add New Agent** to create an agent
-3. Fill in the form:
-   - Agent Name (e.g., "Philip", "CodeReview")
-   - Role (e.g., "Automation Specialist", "DevOps Engineer")
-   - Initial Status (Online, Busy, Offline, Error)
-4. Click **Add Agent** to create
-5. Manage agents from the dashboard:
-   - Change status via dropdown
-   - Delete with confirmation
+2. Review the roster discovered from OpenClaw session indexes
+3. Inspect model/runtime details, task counts, and recent activity per agent
+4. Use the screen as a live operational directory instead of a local editor
 
 ### Managing Tasks
 1. Go to the **Tasks** page
-2. Click **Create New Task** to add a task
-3. Fill in the form:
-   - Title (required)
-   - Description (optional)
-   - Priority (Critical, High, Medium, Low)
-   - Assign to (select an agent)
-4. Click **Create Task**
-5. Manage tasks:
-   - Filter by status (All, Pending, In Progress, Completed, Failed)
-   - Search tasks by title or description
-   - Update status via dropdown
-   - Update progress with quick buttons (0%, 25%, 50%, 75%, 100%)
-   - Delete tasks
+2. Create tasks directly on the live board
+3. Assign them to human or agent owners
+4. Move work between lanes, update progress, change priority, or delete tasks
+5. All changes are persisted to the OpenClaw workspace `kanban.json`
+
+### Projects
+1. Go to the **Projects** page
+2. Review live project groupings derived from the shared board
+3. Assign a project name to tasks from the board to turn ad-hoc work into trackable workstreams
+4. Use the page to see project completion, ownership, and related document density
 
 ### Activity Log
 1. Go to the **Activity** page
-2. View timeline of all events:
-   - Agent updates (create, delete, status changes)
-   - Task updates (create, delete, status changes)
-   - System events (clear logs, etc.)
-3. Filter by activity type
-4. Expand entries to view metadata
-5. Clear all logs with one click
+2. Review the command stream recorded in the real OpenClaw log
+3. Filter the timeline by source category
+4. Use it as the audit trail for what the runtime actually did
+
+### Calendar, Docs, Memory, Team, And Office
+1. Use **Calendar** to inspect cron jobs and heartbeat instructions
+2. Use **Docs** to search markdown files in the OpenClaw workspace root
+3. Use **Memory** to search daily notes from the workspace memory folder
+4. Use **Team** to inspect the current human, assistant, and agent topology
+5. Use **Office** for a live visualization layer grounded in real board and agent data
 
 ## 📁 Project Structure
 
 ```
 mission-control-dashboard/
 ├── app/
+│   ├── calendar/
+│   │   └── page.tsx          # Scheduler and heartbeat view
+│   ├── projects/
+│   │   └── page.tsx          # Live project portfolio view
+│   ├── docs/
+│   │   └── page.tsx          # Workspace document library
+│   ├── memory/
+│   │   └── page.tsx          # Workspace memory library
+│   ├── team/
+│   │   └── page.tsx          # Org and operating-principles view
+│   ├── office/
+│   │   └── page.tsx          # Visual office map
 │   ├── agents/
-│   │   └── page.tsx          # Agents management page
+│   │   └── page.tsx          # Live OpenClaw agent directory
 │   ├── tasks/
-│   │   └── page.tsx          # Tasks management page
+│   │   └── page.tsx          # Writable OpenClaw board
 │   ├── activity/
-│   │   └── page.tsx          # Activity log page
-│   ├── page.tsx              # Main dashboard
+│   │   └── page.tsx          # Command timeline page
+│   ├── api/openclaw/
+│   │   ├── board/route.ts    # Board mutation API
+│   │   └── snapshot/route.ts # Safe snapshot API
+│   ├── live/
+│   │   └── page.tsx          # Raw live system view
+│   ├── page.tsx              # Main mission-control dashboard
 │   ├── layout.tsx            # Root layout
 │   └── globals.css           # Global styles
 ├── components/
-│   ├── AgentCard.tsx         # Agent card component
-│   ├── TaskCard.tsx          # Task card component
+│   ├── OpenClawTaskBoard.tsx         # Live board UI
+│   ├── OpenClawAgentsDirectory.tsx   # Live agent directory UI
+│   ├── OpenClawActivityTimeline.tsx  # Live activity UI
+│   ├── OpenClawDocumentLibrary.tsx   # Reusable docs and memory UI
+│   ├── OpenClawOfficeMap.tsx         # Live office visualization
 │   ├── StatCard.tsx          # Stats card component
 │   └── Navbar.tsx            # Navigation bar
 ├── lib/
-│   ├── hooks/
-│   │   ├── useLocalStorage.ts      # localStorage hook
-│   │   ├── useAgents.ts           # Agents management hook
-│   │   ├── useTasks.ts            # Tasks management hook
-│   │   ├── useActivityLog.ts      # Activity log hook
-│   │   └── useMetrics.ts          # Metrics calculation hook
+│   ├── server/
+│   │   └── openclaw.ts        # Server-only OpenClaw reader and board mutator
+│   ├── hooks/                 # Legacy local hooks kept for reference
 │   └── types.ts              # TypeScript types
 ├── package.json
 └── README.md
 ```
 
-## 🔌 Available Hooks
+## 🔌 Legacy Hooks
+
+The local hooks in `lib/hooks` are still present, but the main routes no longer depend on them. The live app now reads from the server-only OpenClaw model in `lib/server/openclaw.ts`.
+
+## API Routes
+
+### `GET /api/openclaw/snapshot`
+Returns a sanitized summary of the live OpenClaw workspace.
+
+### `GET /api/openclaw/board`
+Returns the live kanban board and assignment options.
+
+### `POST /api/openclaw/board`
+Applies a board mutation to the OpenClaw workspace `kanban.json` file.
+
+## Available Hook Examples
 
 ### `useLocalStorage<T>(key: string, initialValue: T)`
 A custom hook for managing localStorage state.
